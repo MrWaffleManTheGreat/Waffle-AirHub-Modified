@@ -105,7 +105,6 @@ local function GetClosestCharacter()
     end
 end
 
-
 local function Load()
 	OriginalSensitivity = UserInputService.MouseDeltaSensitivity
 
@@ -124,19 +123,19 @@ local function Load()
 		end
 
 		if Running and Environment.Settings.Enabled then
-			GetClosestPlayer()
+			GetClosestCharacter()
 
 			if Environment.Locked then
 				if Environment.Settings.ThirdPerson then
-					local Vector = Camera:WorldToViewportPoint(Environment.Locked.Character[Environment.Settings.LockPart].Position)
+					local Vector = Camera:WorldToViewportPoint(Environment.Locked[Environment.Settings.LockPart].Position)
 
 					mousemoverel((Vector.X - UserInputService:GetMouseLocation().X) * Environment.Settings.ThirdPersonSensitivity, (Vector.Y - UserInputService:GetMouseLocation().Y) * Environment.Settings.ThirdPersonSensitivity)
 				else
 					if Environment.Settings.Sensitivity > 0 then
-						Animation = TweenService:Create(Camera, TweenInfonew(Environment.Settings.Sensitivity, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {CFrame = CFramenew(Camera.CFrame.Position, Environment.Locked.Character[Environment.Settings.LockPart].Position)})
+						Animation = TweenService:Create(Camera, TweenInfonew(Environment.Settings.Sensitivity, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {CFrame = CFramenew(Camera.CFrame.Position, Environment.Locked[Environment.Settings.LockPart].Position)})
 						Animation:Play()
 					else
-						Camera.CFrame = CFramenew(Camera.CFrame.Position, Environment.Locked.Character[Environment.Settings.LockPart].Position)
+						Camera.CFrame = CFramenew(Camera.CFrame.Position, Environment.Locked[Environment.Settings.LockPart].Position)
 					end
 
 					UserInputService.MouseDeltaSensitivity = 0
@@ -202,7 +201,7 @@ function Environment.Functions:Exit()
 	getgenv().AirHub.Aimbot.Functions = nil
 	getgenv().AirHub.Aimbot = nil
 
-	Load = nil; ConvertVector = nil; CancelLock = nil; GetClosestPlayer = nil;
+	Load = nil; ConvertVector = nil; CancelLock = nil; GetClosestCharacter = nil
 end
 
 function Environment.Functions:Restart()
