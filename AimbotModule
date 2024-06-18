@@ -4,9 +4,6 @@
 
 	https://github.com/Exunys
 
-  Modified by Waffle
-  @wafflemanthegreat
-  MrWaffleManTheGreat
 ]]
 
 --// Cache
@@ -82,15 +79,26 @@ end
 local function GetClosestPlayer()
 	if not Environment.Locked then
 		RequiredDistance = (Environment.FOVSettings.Enabled and Environment.FOVSettings.Amount or 2000)
-
-		for _, v in pairs(workspace:GetDescendants()) do
-			if v:IsA("HumanoidRootPart") then
-                v = v.Parent
+        for i,v in pairs(game.Players:GetChildren()) do
+        if v.Name == "AIPlayer" then
+        v:Destroy()
+        end
+        end
+        for i,v in pairs(workspace:GetDescendants()) do
+        if v.Name == "HumanoidRootPart" then
+        plah = Instance.new("Player")
+        plah.Parent = game.Players
+        plah.Name = "AIPlayer"
+        plah.Character = v.Parent
+        end
+        end    
+		for _, v in next, Players:GetPlayers() do
+			if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild(Environment.Settings.LockPart) and v.Character:FindFirstChildOfClass("Humanoid") then
 				if Environment.Settings.TeamCheck and v.TeamColor == LocalPlayer.TeamColor then continue end
-				if Environment.Settings.AliveCheck and v:FindFirstChildOfClass("Humanoid").Health <= 0 then continue end
-				if Environment.Settings.WallCheck and #(Camera:GetPartsObscuringTarget({v[Environment.Settings.LockPart].Position}, v:GetDescendants())) > 0 then continue end
+				if Environment.Settings.AliveCheck and v.Character:FindFirstChildOfClass("Humanoid").Health <= 0 then continue end
+				if Environment.Settings.WallCheck and #(Camera:GetPartsObscuringTarget({v.Character[Environment.Settings.LockPart].Position}, v.Character:GetDescendants())) > 0 then continue end
 
-				local Vector, OnScreen = Camera:WorldToViewportPoint(v[Environment.Settings.LockPart].Position); Vector = ConvertVector(Vector)
+				local Vector, OnScreen = Camera:WorldToViewportPoint(v.Character[Environment.Settings.LockPart].Position); Vector = ConvertVector(Vector)
 				local Distance = (UserInputService:GetMouseLocation() - Vector).Magnitude
 
 				if Distance < RequiredDistance and OnScreen then
@@ -99,7 +107,7 @@ local function GetClosestPlayer()
 				end
 			end
 		end
-	elseif (UserInputService:GetMouseLocation() - ConvertVector(Camera:WorldToViewportPoint(Environment.Locked[Environment.Settings.LockPart].Position))).Magnitude > RequiredDistance then
+	elseif (UserInputService:GetMouseLocation() - ConvertVector(Camera:WorldToViewportPoint(Environment.Locked.Character[Environment.Settings.LockPart].Position))).Magnitude > RequiredDistance then
 		CancelLock()
 	end
 end
@@ -126,15 +134,15 @@ local function Load()
 
 			if Environment.Locked then
 				if Environment.Settings.ThirdPerson then
-					local Vector = Camera:WorldToViewportPoint(Environment.Locked[Environment.Settings.LockPart].Position)
+					local Vector = Camera:WorldToViewportPoint(Environment.Locked.Character[Environment.Settings.LockPart].Position)
 
 					mousemoverel((Vector.X - UserInputService:GetMouseLocation().X) * Environment.Settings.ThirdPersonSensitivity, (Vector.Y - UserInputService:GetMouseLocation().Y) * Environment.Settings.ThirdPersonSensitivity)
 				else
 					if Environment.Settings.Sensitivity > 0 then
-						Animation = TweenService:Create(Camera, TweenInfonew(Environment.Settings.Sensitivity, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {CFrame = CFramenew(Camera.CFrame.Position, Environment.Locked[Environment.Settings.LockPart].Position)})
+						Animation = TweenService:Create(Camera, TweenInfonew(Environment.Settings.Sensitivity, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {CFrame = CFramenew(Camera.CFrame.Position, Environment.Locked.Character[Environment.Settings.LockPart].Position)})
 						Animation:Play()
 					else
-						Camera.CFrame = CFramenew(Camera.CFrame.Position, Environment.Locked[Environment.Settings.LockPart].Position)
+						Camera.CFrame = CFramenew(Camera.CFrame.Position, Environment.Locked.Character[Environment.Settings.LockPart].Position)
 					end
 
 					UserInputService.MouseDeltaSensitivity = 0
