@@ -4,9 +4,6 @@
 
 	https://github.com/Exunys
 
-  Modified by Waffle
-  @wafflemanthegreat
-  MrWaffleManTheGreat
 ]]
 
 --// Cache
@@ -79,30 +76,35 @@ local function CancelLock()
 	end
 end
 
-local function GetClosestPlayer()
-	if not Environment.Locked then
-		RequiredDistance = (Environment.FOVSettings.Enabled and Environment.FOVSettings.Amount or 2000)
+local function GetClosestCharacter()
+    if not Environment.Locked then
+        RequiredDistance = (Environment.FOVSettings.Enabled and Environment.FOVSettings.Amount or 2000)
 
-		for _, v in pairs(workspace:GetDescendants()) do
-			if v:IsA("HumanoidRootPart") then
-                v = v.Parent
-				if Environment.Settings.TeamCheck and v.TeamColor == LocalPlayer.TeamColor then continue end
-				if Environment.Settings.AliveCheck and v:FindFirstChildOfClass("Humanoid").Health <= 0 then continue end
-				if Environment.Settings.WallCheck and #(Camera:GetPartsObscuringTarget({v[Environment.Settings.LockPart].Position}, v:GetDescendants())) > 0 then continue end
+        for _, descendant in next, game.Workspace:GetDescendants() do
+            if descendant.Name == "HumanoidRootPart" then
+                local character = descendant.Parent
+                local humanoid = character:FindFirstChildOfClass("Humanoid")
 
-				local Vector, OnScreen = Camera:WorldToViewportPoint(v[Environment.Settings.LockPart].Position); Vector = ConvertVector(Vector)
-				local Distance = (UserInputService:GetMouseLocation() - Vector).Magnitude
+                if humanoid then
+                    if Environment.Settings.TeamCheck and character:FindFirstChild("TeamColor") and character.TeamColor == LocalPlayer.TeamColor then continue end
+                    if Environment.Settings.AliveCheck and humanoid.Health <= 0 then continue end
+                    if Environment.Settings.WallCheck and #(Camera:GetPartsObscuringTarget({descendant.Position}, character:GetDescendants())) > 0 then continue end
 
-				if Distance < RequiredDistance and OnScreen then
-					RequiredDistance = Distance
-					Environment.Locked = v
-				end
-			end
-		end
-	elseif (UserInputService:GetMouseLocation() - ConvertVector(Camera:WorldToViewportPoint(Environment.Locked[Environment.Settings.LockPart].Position))).Magnitude > RequiredDistance then
-		CancelLock()
-	end
+                    local Vector, OnScreen = Camera:WorldToViewportPoint(descendant.Position); Vector = ConvertVector(Vector)
+                    local Distance = (UserInputService:GetMouseLocation() - Vector).Magnitude
+
+                    if Distance < RequiredDistance and OnScreen then
+                        RequiredDistance = Distance
+                        Environment.Locked = character
+                    end
+                end
+            end
+        end
+    elseif (UserInputService:GetMouseLocation() - ConvertVector(Camera:WorldToViewportPoint(Environment.Locked:FindFirstChild("HumanoidRootPart").Position))).Magnitude > RequiredDistance then
+        CancelLock()
+    end
 end
+
 
 local function Load()
 	OriginalSensitivity = UserInputService.MouseDeltaSensitivity
@@ -126,15 +128,15 @@ local function Load()
 
 			if Environment.Locked then
 				if Environment.Settings.ThirdPerson then
-					local Vector = Camera:WorldToViewportPoint(Environment.Locked[Environment.Settings.LockPart].Position)
+					local Vector = Camera:WorldToViewportPoint(Environment.Locked.Character[Environment.Settings.LockPart].Position)
 
 					mousemoverel((Vector.X - UserInputService:GetMouseLocation().X) * Environment.Settings.ThirdPersonSensitivity, (Vector.Y - UserInputService:GetMouseLocation().Y) * Environment.Settings.ThirdPersonSensitivity)
 				else
 					if Environment.Settings.Sensitivity > 0 then
-						Animation = TweenService:Create(Camera, TweenInfonew(Environment.Settings.Sensitivity, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {CFrame = CFramenew(Camera.CFrame.Position, Environment.Locked[Environment.Settings.LockPart].Position)})
+						Animation = TweenService:Create(Camera, TweenInfonew(Environment.Settings.Sensitivity, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {CFrame = CFramenew(Camera.CFrame.Position, Environment.Locked.Character[Environment.Settings.LockPart].Position)})
 						Animation:Play()
 					else
-						Camera.CFrame = CFramenew(Camera.CFrame.Position, Environment.Locked[Environment.Settings.LockPart].Position)
+						Camera.CFrame = CFramenew(Camera.CFrame.Position, Environment.Locked.Character[Environment.Settings.LockPart].Position)
 					end
 
 					UserInputService.MouseDeltaSensitivity = 0
