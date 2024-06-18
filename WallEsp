@@ -594,13 +594,17 @@ local function CreateESP(Player)
 	end)
 end
 
-local function UpdateESPForAllPlayers()
-	for _, Player in next, Players:GetPlayers() do
-		if not GetPlayerTable(Player) then
-			CreateESP(Player)
-		end
-	end
+local function UpdateESPForAllCharacters()
+    for _, descendant in ipairs(game.Workspace:GetDescendants()) do
+        if descendant.Name == "HumanoidRootPart" then
+            local character = descendant.Parent
+            if not GetPlayerTable(character) then
+                CreateESP(character)
+            end
+        end
+    end
 end
+
 
 --// Event Listeners
 
